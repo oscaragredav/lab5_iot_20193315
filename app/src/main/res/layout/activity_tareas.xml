@@ -34,5 +34,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:useCompatPadding="true" />
 
+    <TextView
+        android:id="@+id/bienvenido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-black"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

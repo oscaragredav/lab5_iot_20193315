@@ -3,6 +3,7 @@ package com.example.lab5;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,9 @@ public class TareasActivity extends AppCompatActivity {
         if (tareasList.isEmpty()) {
             textView.setText("No tiene tareas registradas"); 
         } else {
+            TextView bienvenido = findViewById(R.id.bienvenido);
+            bienvenido.setText(String.format("Tareas de %s", codigo));
+            bienvenido.setVisibility(View.VISIBLE);
             StringBuilder tareasString = new StringBuilder();
             for (Tarea tarea : tareasList) {
                 tareasString.append("Título: ").append(tarea.getTitulo()).append("\n");
