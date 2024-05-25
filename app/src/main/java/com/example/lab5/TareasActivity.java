@@ -36,7 +36,7 @@ import java.util.ArrayList;
 public class TareasActivity extends AppCompatActivity {
 
     String canal1 = "importanteDefault";
-    private final int NOTIFICATION_ID = 1;
+    String codigo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class TareasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tareas);
         createNotificationChannel();
 
-        String codigo = getIntent().getStringExtra("codigoPUCP");
+        codigo = getIntent().getStringExtra("codigoPUCP");
         FloatingActionButton agregar = (FloatingActionButton) findViewById(R.id.agregar);
 
 
@@ -108,11 +108,12 @@ public class TareasActivity extends AppCompatActivity {
     }
     private void actualizarNotificacion(int numeroTareas) {
         Intent intent = new Intent(this, TareasActivity.class);
+        intent.putExtra("codigoPUCP", codigo);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, canal1)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Tareas Registradas")
+                .setContentTitle("Tareas Registradas por " + codigo)
                 .setContentText("Número de tareas: " + numeroTareas)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
