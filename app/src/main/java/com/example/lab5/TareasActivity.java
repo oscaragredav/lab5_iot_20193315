@@ -1,7 +1,15 @@
 package com.example.lab5;
 
+import static android.Manifest.permission.POST_NOTIFICATIONS;
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +18,9 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,10 +35,14 @@ import java.util.ArrayList;
 
 public class TareasActivity extends AppCompatActivity {
 
+    String canal1 = "importanteDefault";
+    private final int NOTIFICATION_ID = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tareas);
+        createNotificationChannel();
 
         String codigo = getIntent().getStringExtra("codigoPUCP");
         FloatingActionButton agregar = (FloatingActionButton) findViewById(R.id.agregar);
@@ -51,7 +66,7 @@ public class TareasActivity extends AppCompatActivity {
 
         TextView textView = findViewById(R.id.textView);
         if (tareasList.isEmpty()) {
-            textView.setText("No tiene tareas registradas"); 
+            textView.setText("No tiene tareas registradas");
         } else {
             TextView bienvenido = findViewById(R.id.bienvenido);
             bienvenido.setText(String.format("Tareas de %s", codigo));
@@ -63,6 +78,50 @@ public class TareasActivity extends AppCompatActivity {
                 tareasString.append("Fecha: ").append(tarea.getFecha()).append("\n\n");
             }
             textView.setText(tareasString.toString());
+        }actualizarNotificacion(tareasList.size());
+
+    }
+
+
+
+    //NOTIDICACION
+    private void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(canal1,
+                    "Canal notificaciones default",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Canal para notificaciones con prioridad default");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+            askPermission();
+        }
+    }
+    private void askPermission() {
+        //android.os.Build.VERSION_CODES.TIRAMISU == 33
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) ==
+                        PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(TareasActivity.this,
+                    new String[]{POST_NOTIFICATIONS},
+                    101);
+        }
+    }
+    private void actualizarNotificacion(int numeroTareas) {
+        Intent intent = new Intent(this, TareasActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, canal1)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Tareas Registradas")
+                .setContentText("Número de tareas: " + numeroTareas)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                // para la  persistente
+                .setOngoing(true);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            notificationManager.notify(1, builder.build());
         }
     }
 }
